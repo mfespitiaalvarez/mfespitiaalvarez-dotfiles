@@ -1,16 +1,13 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  branch = "main",
+  branch = "master",          -- stable branch (the `main` rewrite is async-only/experimental)
   build = ":TSUpdate",
-  lazy = false,
   config = function()
-    local parsers = { "c", "lua", "vim", "vimdoc", "query", "python", "go", "cpp", "bash" }
-    require("nvim-treesitter").install(parsers)
-
-    vim.api.nvim_create_autocmd("FileType", {
-      callback = function(args)
-        pcall(vim.treesitter.start, args.buf)
-      end,
+    require("nvim-treesitter.configs").setup({
+      ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "python", "go", "cpp", "bash" },
+      auto_install = true,     -- grab a parser automatically when opening a new filetype
+      highlight = { enable = true },
+      indent = { enable = true },
     })
   end,
 }

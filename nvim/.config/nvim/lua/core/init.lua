@@ -36,8 +36,8 @@ opt.undofile = true
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { desc = "project: file explorer" })
 
 -- Diagnostic navigation (works without an LSP attached too)
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "next diagnostic" })
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "prev diagnostic" })
+vim.keymap.set("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "next diagnostic" })
+vim.keymap.set("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "prev diagnostic" })
 
 -- Quickfix navigation (pairs with :grep, :cdo, Telescope send-to-quickfix)
 vim.keymap.set("n", "]q", "<cmd>cnext<cr>", { desc = "next quickfix" })
