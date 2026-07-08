@@ -47,6 +47,9 @@ vim.keymap.set("n", "[q", "<cmd>cprev<cr>", { desc = "prev quickfix" })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "half-page down (centered)" })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "half-page up (centered)" })
 
+-- Clear Search Highlighting with Esc
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
+
 -- Autocmds ----------------------------------------------------------------
 
 -- Hybrid line numbers: relative on the active window in Normal mode,

@@ -9,5 +9,6 @@
   "nvim-treesitter": { "branch": "master", "commit": "cf12346a3414fa1b06af75c79faebe7f76df080a" },
   "plenary.nvim": { "branch": "master", "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b" },
   "telescope.nvim": { "branch": "master", "commit": "9377230aa5305d9e9aca4ed8dadf1070fb4aa9fc" },
+  "vim-bsv": { "branch": "master", "commit": "b03893b98f5b772297e48671a9c5f92f1c7d10eb" },
   "vim-tmux-navigator": { "branch": "master", "commit": "e41c431a0c7b7388ae7ba341f01a0d217eb3a432" }
 }

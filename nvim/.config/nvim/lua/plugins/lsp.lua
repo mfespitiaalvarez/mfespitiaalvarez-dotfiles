@@ -10,6 +10,9 @@ return {
       require("mason").setup()
       require("mason-lspconfig").setup({
         -- Add "matlab_ls" here if MATLAB is installed on this machine.
+        -- Add "asm_lsp" (RISC-V/x86 assembly hover docs) once rustup/cargo is
+        -- installed — Mason builds it from source. Per-project settings live
+        -- in .asm-lsp.toml at each repo root.
         ensure_installed = { "pyright", "clangd", "marksman" },
       })
 
