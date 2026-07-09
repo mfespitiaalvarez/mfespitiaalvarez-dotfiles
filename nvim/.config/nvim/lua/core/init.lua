@@ -47,6 +47,10 @@ vim.keymap.set("n", "[q", "<cmd>cprev<cr>", { desc = "prev quickfix" })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "half-page down (centered)" })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "half-page up (centered)" })
 
+-- Centered line jumps: the count applies to the first command in the mapping,
+-- so 50G lands on line 50 and then centers.
+vim.keymap.set("n", "G", "Gzz", { desc = "goto line (centered)" })
+
 -- Clear Search Highlighting with Esc
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 
