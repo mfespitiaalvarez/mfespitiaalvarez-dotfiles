@@ -69,3 +69,18 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave"
   group = numgrp,
   callback = function() if vim.wo.number then vim.wo.relativenumber = false end end,
 })
+
+-- Format-on-save for C++ via clangd (whose formatter is clang-format and
+-- honors the repo's .clang-format). Synchronous so the formatted buffer is
+-- what hits the disk. The vim.fs.root guard makes this opt-in per repo:
+-- projects without a .clang-format are left untouched.
+local fmtgrp = vim.api.nvim_create_augroup("ClangFormatOnSave", { clear = true })
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = fmtgrp,
+  pattern = { "*.h", "*.cc" },
+  callback = function(args)
+    if vim.fs.root(args.buf, ".clang-format") then
+      vim.lsp.buf.format({ bufnr = args.buf, async = false })
+    end
+  end,
+})
