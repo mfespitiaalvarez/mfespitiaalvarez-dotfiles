@@ -37,7 +37,15 @@ window-decoration = client
 gtk-titlebar = false
 
 # tmux owns the multiplexing layer, so keep Ghostty's own chrome quiet.
-window-padding-x = 2
-window-padding-y = 2
 gtk-tabs-location = hidden
 gtk-single-instance = true
+
+# Padding has to clear the rounded corners set above. At 2pt the corner arc
+# cut into the first and last cells, so the ends of the tmux status bar and
+# the prompt looked crowded; 6pt puts the text outside the arc. Values are in
+# points, so they scale with DPI. Balance spreads the leftover partial-cell
+# padding across all four edges instead of piling it on the right and bottom,
+# so every corner gets the same clearance.
+window-padding-x = 6
+window-padding-y = 6
+window-padding-balance = true
