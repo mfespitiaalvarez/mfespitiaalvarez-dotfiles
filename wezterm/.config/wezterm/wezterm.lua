@@ -4,38 +4,45 @@ local config = wezterm.config_builder()
 -- ==========================
 -- Appearance
 -- ==========================
--- Mirrors the built-in "Ubuntu" scheme from Windows Terminal — aubergine
--- background with the Tango ANSI palette.
+-- Atom One Dark, hex-for-hex identical to the ghostty config on Linux and to
+-- onedark.nvim's "dark" style, so the terminal, the tmux status bar and the
+-- editor all sit on the same #282c34 surface with no seam between them.
 config.colors = {
-  foreground = '#EEEEEC',
-  background = '#300A24',
-  cursor_bg = '#BBBBBB',
-  cursor_fg = '#300A24',
-  cursor_border = '#BBBBBB',
-  selection_bg = '#B5D5FF',
-  selection_fg = '#300A24',
+  foreground = '#abb2bf',
+  background = '#282c34',
+  cursor_bg = '#abb2bf',
+  cursor_fg = '#282c34',
+  cursor_border = '#abb2bf',
+  selection_bg = '#3e4451',
+  selection_fg = '#abb2bf',
   ansi = {
-    '#2E3436', -- black
-    '#CC0000', -- red
-    '#4E9A06', -- green
-    '#C4A000', -- yellow
-    '#3465A4', -- blue
-    '#75507B', -- magenta
-    '#06989A', -- cyan
-    '#D3D7CF', -- white
+    '#21252b', -- black
+    '#e06c75', -- red
+    '#98c379', -- green
+    '#e5c07b', -- yellow
+    '#61afef', -- blue
+    '#c678dd', -- magenta
+    '#56b6c2', -- cyan
+    '#abb2bf', -- white
   },
+  -- One Dark has no separate bright ramp: only black lifts to a visible grey,
+  -- the rest repeat the normal colors. This matches ghostty's shipped theme.
   brights = {
-    '#555753',
-    '#EF2929',
-    '#8AE234',
-    '#FCE94F',
-    '#729FCF',
-    '#AD7FA8',
-    '#34E2E2',
-    '#EEEEEC',
+    '#767676',
+    '#e06c75',
+    '#98c379',
+    '#e5c07b',
+    '#61afef',
+    '#c678dd',
+    '#56b6c2',
+    '#abb2bf',
   },
 }
+-- Prefer the Nerd Font "Mono" variant so the tmux/catppuccin status bar glyphs
+-- render at single-cell width, same as ghostty. Falls back to plain JetBrains
+-- Mono if the Nerd Font isn't installed on the Windows host.
 config.font = wezterm.font_with_fallback({
+  'JetBrainsMono Nerd Font Mono',
   'JetBrains Mono',
   'Cascadia Code',
   'Menlo',

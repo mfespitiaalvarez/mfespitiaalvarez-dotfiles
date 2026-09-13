@@ -1,0 +1,38 @@
+# ==========================
+# Font
+# ==========================
+# JetBrainsMono Nerd Font (installed under ~/.local/share/fonts/JetBrainsMono).
+# The "Mono" variant keeps Nerd Font icons at single-cell width so columns stay
+# aligned (matters for the tmux/catppuccin status bar).
+font-family = JetBrainsMono Nerd Font Mono
+font-size = 11
+
+# ==========================
+# Colors — Atom One Dark
+# ==========================
+# Ghostty ships the palette (/usr/share/ghostty/themes/Atom One Dark). Its
+# background is #21252b — Atom's *sidebar* shade. Override to #282c34, the
+# editor background, so the terminal matches onedark.nvim edge-to-edge and
+# there's no seam where nvim's background ends.
+theme = Atom One Dark
+background = #282c34
+cursor-text = #282c34
+selection-background = #3e4451
+
+# Block cursor.
+cursor-style = block
+
+# ==========================
+# Window
+# ==========================
+# Borderless: no OS title bar or min/max/close buttons — just the terminal.
+# With no titlebar there's no click target to drag/close the window: move via
+# the WM shortcut (often Super+drag) and close by exiting the shell. Reverse by
+# setting this to "auto".
+window-decoration = none
+
+# tmux owns the multiplexing layer, so keep Ghostty's own chrome quiet.
+window-padding-x = 2
+window-padding-y = 2
+gtk-tabs-location = hidden
+gtk-single-instance = true

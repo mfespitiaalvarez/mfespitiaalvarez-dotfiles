@@ -1,6 +1,9 @@
 # dotfiles
 
-My tmux + Neovim configs, laid out for [GNU stow](https://www.gnu.org/software/stow/).
+My Ghostty + tmux + Neovim configs, laid out for [GNU stow](https://www.gnu.org/software/stow/).
+
+Everything is themed **Atom One Dark** — the terminal background, the tmux status
+bar and the editor all sit on `#282c34` so there's no seam between them.
 
 ## Layout
 
@@ -8,11 +11,22 @@ Each top-level directory is a "stow package" that mirrors `$HOME`:
 
 ```
 .
+├── ghostty/
+│   └── .config/ghostty/    -> ~/.config/ghostty/    (Linux)
 ├── tmux/
 │   └── .tmux.conf          -> ~/.tmux.conf
-└── nvim/
-    └── .config/nvim/       -> ~/.config/nvim/
+├── nvim/
+│   └── .config/nvim/       -> ~/.config/nvim/
+└── wezterm/
+    └── .config/wezterm/    -> ~/.config/wezterm/    (Windows only)
 ```
+
+Ghostty is the Linux terminal; wezterm is the Windows one (its config has a WSL
+block that drops straight into the Ubuntu distro). Only stow `wezterm` on Windows
+hosts — on Linux, leave it alone.
+
+Both carry the same Atom One Dark palette, hex-for-hex, so a session looks
+identical whichever host it's on.
 
 ## Required packages (Debian / Ubuntu / gLinux)
 
@@ -86,12 +100,16 @@ tree-sitter --version
 git clone <repo-url> ~/dotfiles
 cd ~/dotfiles
 
-# 3. Symlink
-stow tmux
-stow nvim
+# 3. Symlink (-t is required unless the repo sits directly in $HOME)
+stow -t ~ tmux nvim ghostty
 ```
 
-`stow tmux` creates `~/.tmux.conf` as a symlink into the repo. Same for nvim — `~/.config/nvim/` ends up pointing here.
+`stow` defaults its target to the repo's **parent** directory, which is only `$HOME`
+if you cloned straight into it. This repo lives at `~/dev/.mfespitiaalvarez_dotfiles`,
+so `stow tmux` on its own would link into `~/dev/`. Always pass `-t ~`.
+
+`stow -t ~ tmux` creates `~/.tmux.conf` as a symlink into the repo. Same for nvim and
+ghostty — `~/.config/nvim/` and `~/.config/ghostty/` end up pointing here.
 
 If a real file is already in the way, stow refuses and tells you which one. Move or delete it, then re-run.
 
@@ -100,8 +118,9 @@ If a real file is already in the way, stow refuses and tells you which one. Move
 ```bash
 mv ~/.tmux.conf ~/.tmux.conf.bak
 mv ~/.config/nvim ~/.config/nvim.bak
+mv ~/.config/ghostty ~/.config/ghostty.bak
 cd <this-repo>
-stow tmux nvim
+stow -t ~ tmux nvim ghostty
 ```
 
 Verify with `ls -l ~/.tmux.conf` — should show `-> .../tmux/.tmux.conf`.
@@ -120,10 +139,10 @@ git pull
 git add -u && git commit -m "..." && git push
 ```
 
-To uninstall on a machine: `stow -D tmux nvim` removes the symlinks (originals stay in the repo).
+To uninstall on a machine: `stow -D -t ~ tmux nvim ghostty` removes the symlinks (originals stay in the repo).
 
 ## Adding a new tool
 
 1. Create `<tool>/` mirroring its location under `$HOME`.
 2. Move the config in.
-3. `stow <tool>`.
+3. `stow -t ~ <tool>`.
