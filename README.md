@@ -1,32 +1,42 @@
 # dotfiles
 
-My Ghostty + tmux + Neovim configs, laid out for [GNU stow](https://www.gnu.org/software/stow/).
+My terminal + tmux + Neovim configs (Ghostty on Linux, WezTerm on Windows/WSL), laid out for [GNU stow](https://www.gnu.org/software/stow/).
 
 Everything is themed **Atom One Dark** — the terminal background, the tmux status
 bar and the editor all sit on `#282c34` so there's no seam between them.
 
 ## Layout
 
-Each top-level directory is a "stow package" that mirrors `$HOME`:
+Each top-level directory is a "stow package" that mirrors `$HOME` — except
+`windows/`, which isn't stowed at all (see below):
 
 ```
 .
 ├── ghostty/
-│   └── .config/ghostty/    -> ~/.config/ghostty/    (Linux)
+│   └── .config/ghostty/    -> ~/.config/ghostty/    (native Linux)
 ├── tmux/
 │   └── .tmux.conf          -> ~/.tmux.conf
 ├── nvim/
 │   └── .config/nvim/       -> ~/.config/nvim/
-└── wezterm/
-    └── .config/wezterm/    -> ~/.config/wezterm/    (Windows only)
+├── wezterm/
+│   └── .config/wezterm/    -> ~/.config/wezterm/    (WSL)
+└── windows/                   copied by hand to the Windows host — NOT stowed
+    ├── .wezterm.lua           -> C:\Users\<you>\.wezterm.lua
+    ├── .wslconfig             -> C:\Users\<you>\.wslconfig
+    ├── wsl.conf               -> /etc/wsl.conf  (inside the distro)
+    └── wsl-host-setup.sh      does all of the above + the ~/win symlink
 ```
 
-Ghostty is the Linux terminal; wezterm is the Windows one (its config has a WSL
-block that drops straight into the Ubuntu distro). Only stow `wezterm` on Windows
-hosts — on Linux, leave it alone.
+Ghostty is the terminal on native Linux; wezterm is the terminal on a Windows
+laptop running WSL. Both carry the same Atom One Dark palette, hex-for-hex, so
+a session looks identical whichever host it's on.
 
-Both carry the same Atom One Dark palette, hex-for-hex, so a session looks
-identical whichever host it's on.
+Note where the wezterm package gets stowed: **inside WSL**, not on Windows.
+`wezterm.exe` is a Windows program and can't read a stowed Linux config, so the
+Windows profile gets a small bootstrap (`windows/.wezterm.lua`) that reads the
+real config back out of WSL. Full story in
+[Windows + WSL host setup](#windows--wsl-host-setup). On a native Linux box,
+ignore `wezterm/` and `windows/` entirely.
 
 ## Required packages (Debian / Ubuntu / gLinux)
 
@@ -100,18 +110,123 @@ tree-sitter --version
 git clone <repo-url> ~/dotfiles
 cd ~/dotfiles
 
-# 3. Symlink (-t is required unless the repo sits directly in $HOME)
+# 3. Symlink. Pick the terminal package for this host:
+#      native Linux -> ghostty      WSL -> wezterm
 stow -t ~ tmux nvim ghostty
+
+# 4. tmux plugin manager (.tmux.conf sources it; without it the status bar
+#    comes up unstyled and every @plugin line is inert)
+git clone --depth 1 https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 ```
 
-`stow` defaults its target to the repo's **parent** directory, which is only `$HOME`
-if you cloned straight into it. This repo lives at `~/dev/.mfespitiaalvarez_dotfiles`,
-so `stow tmux` on its own would link into `~/dev/`. Always pass `-t ~`.
+Then start tmux and press `prefix + I` (capital i) to install the plugins.
+
+`stow` defaults its target to the repo's **parent** directory, which is `$HOME` only
+if you cloned straight into it. This repo currently sits at `~/mfespitiaalvarez_dotfiles`,
+where the default happens to be right — but clone it one level deeper and `stow tmux`
+would quietly link into the wrong directory. Always pass `-t ~`.
 
 `stow -t ~ tmux` creates `~/.tmux.conf` as a symlink into the repo. Same for nvim and
-ghostty — `~/.config/nvim/` and `~/.config/ghostty/` end up pointing here.
+the terminal package — `~/.config/nvim/` and `~/.config/{ghostty,wezterm}/` end up
+pointing here.
 
 If a real file is already in the way, stow refuses and tells you which one. Move or delete it, then re-run.
+
+## Windows + WSL host setup
+
+On a Windows laptop the shell, tmux, nvim and the dotfiles all live inside WSL,
+but the terminal is a Windows program. That split is the only awkward part, and
+it's what everything in `windows/` exists to bridge.
+
+`wezterm.exe` starts before WSL is necessarily running and reads its config from
+the **Windows** profile, so it can't use the stowed Linux one. Rather than keep
+two copies in sync, the Windows profile holds a 15-line bootstrap
+(`windows/.wezterm.lua`) that shells out to `wsl.exe` and evaluates the real
+config from the repo. The Windows side then never needs touching again — every
+change happens in `wezterm/.config/wezterm/wezterm.lua` and takes effect on the
+next `Ctrl+Shift+R`.
+
+The config itself sets `default_domain = 'WSL:Ubuntu'`, so opening wezterm drops
+straight into the Linux home with tmux and nvim on the same `#282c34` surface.
+
+### Rebuilding from scratch
+
+After a factory reset, in this order:
+
+```powershell
+# In Windows PowerShell (admin), reboot when it asks:
+wsl --install -d Ubuntu
+```
+
+Install [WezTerm](https://wezterm.org/install/windows.html) and
+[Docker Desktop](https://docs.docker.com/desktop/install/windows-install/) on
+Windows, then install **JetBrainsMono Nerd Font on Windows too** — download
+`JetBrainsMono.zip` from the
+[nerd-fonts releases](https://github.com/ryanoasis/nerd-fonts/releases), select
+all, right-click → Install. wezterm.exe is a Windows app and only sees Windows
+fonts; installing the font inside WSL does nothing for it. The config asks for
+the `Mono` variant first, so the tmux status-bar glyphs stay single-cell.
+
+Then inside the Ubuntu distro:
+
+```bash
+# prereqs from the package list above, plus:
+sudo apt install -y git stow
+
+git clone <repo-url> ~/mfespitiaalvarez_dotfiles
+cd ~/mfespitiaalvarez_dotfiles
+
+# WSL <-> Windows glue: ~/win, the Windows-side config files, shared cloud
+# credentials, tpm. Idempotent, safe to re-run after editing windows/.
+./windows/wsl-host-setup.sh
+
+# the configs themselves
+stow -t ~ tmux nvim wezterm
+
+# the one step the script can't do for you (needs sudo)
+sudo cp windows/wsl.conf /etc/wsl.conf
+```
+
+Finally, from Windows: `wsl --shutdown` to apply `wsl.conf`/`.wslconfig`, then
+enable **Docker Desktop → Settings → Resources → WSL integration** for the
+distro. Docker Desktop creates `~/.docker/contexts` and `~/.docker/features.json`
+as links into the Windows profile itself once that toggle is on — don't make
+those by hand.
+
+### What the glue actually does
+
+| Piece | Why |
+| --- | --- |
+| `~/win -> /mnt/c/Users/<you>` | Short path to the Windows profile — `~/win/Downloads` instead of `/mnt/c/Users/<you>/Downloads`, and tab-completion from the Linux side. |
+| `~/.aws`, `~/.azure -> ~/win/.aws`, `~/win/.azure` | One login serves both sides; `az login` in Windows and the CLIs in WSL share a token cache. Only linked once the Windows-side directories exist. |
+| `/etc/wsl.conf` → `automount options = "metadata"` | Without it every file under `/mnt/c` reads as 0777 root-owned, `chmod` silently does nothing, and symlinks made there don't stick. |
+| `/etc/wsl.conf` → `systemd=true` | Services behave like a normal Ubuntu box instead of needing manual starts. |
+| `.wslconfig` → `networkingMode=mirrored` | `localhost` works in both directions — a server bound in WSL is reachable from a Windows browser and vice versa. Windows 11 22H2+. |
+
+### Gotchas worth not rediscovering
+
+Both are already handled in `windows/.wezterm.lua`; the comments there say so
+too, so don't "simplify" them away:
+
+- **Reading the config over `\\wsl.localhost\...` doesn't work.** Lua's `dofile`
+  can't open those paths reliably, because the 9P share is sometimes still cold
+  when wezterm starts. Shell out through `wsl.exe` instead.
+- **`io.popen` makes a console window flash on every launch.** It goes through
+  `cmd.exe`, and a GUI app spawning a console child makes Windows allocate a
+  console, which Windows Terminal then hosts as a visible window — on startup
+  and on every `Ctrl+Shift+R`. `wezterm.run_child_process` spawns with
+  `CREATE_NO_WINDOW` and stays quiet.
+
+If wezterm opens to an error instead of a shell, run the bootstrap's command by
+hand from PowerShell to see what broke:
+
+```powershell
+wsl.exe -d Ubuntu -- sh -c 'cat ~/.config/wezterm/wezterm.lua'
+```
+
+Empty output means the stow step didn't run or the distro's default user isn't
+the one holding the dotfiles (`[user] default=` in `/etc/wsl.conf`). A different
+distro name means editing the `-d Ubuntu` argument; `wsl.exe -l -v` lists them.
 
 ## Switching over a machine that already has configs
 
@@ -139,7 +254,7 @@ git pull
 git add -u && git commit -m "..." && git push
 ```
 
-To uninstall on a machine: `stow -D -t ~ tmux nvim ghostty` removes the symlinks (originals stay in the repo).
+To uninstall on a machine: `stow -D -t ~ tmux nvim ghostty wezterm` removes the symlinks (originals stay in the repo).
 
 ## Adding a new tool
 

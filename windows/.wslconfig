@@ -1,0 +1,11 @@
+# Goes to C:\Users\<you>\.wslconfig on the Windows host. Applies to every
+# distro; edit it from Windows, then `wsl --shutdown` to pick up changes.
+
+[wsl2]
+# Mirrored networking: the distro shares the Windows host's network interfaces
+# instead of sitting behind a NAT'd virtual switch. This is what makes
+# localhost work in both directions — a server bound inside WSL is reachable
+# from a Windows browser at localhost, and a Windows service (Docker Desktop,
+# a dev server) is reachable from inside WSL the same way. Needs Windows 11
+# 22H2+; on older builds drop this line and use the host IP instead.
+networkingMode=mirrored
