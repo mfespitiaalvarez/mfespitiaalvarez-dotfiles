@@ -25,11 +25,16 @@ cursor-style = block
 # ==========================
 # Window
 # ==========================
-# Borderless: no OS title bar or min/max/close buttons — just the terminal.
+# Borderless, but rounded: GTK draws the window itself (client-side
+# decorations) and hides only the titlebar. The rounded corners come from that
+# GTK decoration, not from the compositor — "none" is borderless too, but its
+# corners come out square. The window keeps its drop shadow and resize edges.
+#
 # With no titlebar there's no click target to drag/close the window: move via
 # the WM shortcut (often Super+drag) and close by exiting the shell. Reverse by
-# setting this to "auto".
-window-decoration = none
+# setting window-decoration to "none" (square) or gtk-titlebar to true.
+window-decoration = client
+gtk-titlebar = false
 
 # tmux owns the multiplexing layer, so keep Ghostty's own chrome quiet.
 window-padding-x = 2
