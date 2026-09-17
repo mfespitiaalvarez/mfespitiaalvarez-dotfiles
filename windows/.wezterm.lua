@@ -22,7 +22,7 @@
 -- isn't named Ubuntu, change the -d argument; `wsl.exe -l -v` lists them.
 local wezterm = require('wezterm')
 local ok, stdout, stderr = wezterm.run_child_process({
-  'wsl.exe', '-d', 'Ubuntu', '--',
+  'wsl.exe', '-d', 'Ubuntu-26.04', '--',
   'sh', '-c', 'cat ~/.config/wezterm/wezterm.lua',
 })
 assert(ok, 'failed to read wezterm.lua from WSL: ' .. (stderr or '?'))

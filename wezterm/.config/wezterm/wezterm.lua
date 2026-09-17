@@ -82,7 +82,7 @@ config.tab_max_width = 32
 -- into the Linux home where tmux/nvim live. No-op on Linux/macOS.
 if wezterm.target_triple:find('windows') then
   config.wsl_domains = wezterm.default_wsl_domains()
-  config.default_domain = 'WSL:Ubuntu'
+  config.default_domain = 'WSL:Ubuntu-26.04'
 end
 
 -- ==========================
